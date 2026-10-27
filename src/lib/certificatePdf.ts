@@ -5,6 +5,9 @@ export interface CertificatePdfInput {
   courseName: string;
   certificateNumber: string;
   issuedAt: string;
+  customTitle?: string | null;
+  customSubtitle?: string | null;
+  customDate?: string | null;
 }
 
 /** Certificat PDF paysage (cahier des charges : nom étudiant, cours, téléchargement). */

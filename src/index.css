@@ -9,3 +9,77 @@
   :root {
     --background: 38 30% 95%;
     --foreground: 220 13% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 13%;
+    --primary: 220 60% 30%;
+    --primary-foreground: 38 30% 95%;
+    --secondary: 38 25% 88%;
+    --secondary-foreground: 220 13% 13%;
+    --muted: 38 20% 92%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 42 75% 55%;
+    --accent-foreground: 220 13% 13%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
+    --ring: 220 60% 30%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 42 60% 85%;
+    --card: 222 47% 9%;
+    --card-foreground: 42 60% 85%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 42 60% 85%;
+    --primary: 42 75% 55%;
+    --primary-foreground: 222 47% 7%;
+    --secondary: 222 40% 15%;
+    --secondary-foreground: 42 60% 85%;
+    --muted: 222 40% 12%;
+    --muted-foreground: 42 30% 55%;
+    --accent: 42 75% 55%;
+    --accent-foreground: 222 47% 7%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 40% 18%;
+    --input: 222 40% 18%;
+    --ring: 42 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .section-divider {
+    @apply text-center text-gold-400/60 my-8 tracking-[0.5em];
+  }
+
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .fade-in-0 {
+    --tw-enter-opacity: 0;
+  }
+
+  .zoom-in-95 {
+    --tw-enter-scale: .95;
+  }
+}

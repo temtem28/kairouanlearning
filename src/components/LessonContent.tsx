@@ -78,8 +78,8 @@ const LessonContent: React.FC<LessonContentProps> = ({ content }) => {
             </ol>
           ),
           li: ({ children, ...props }) => {
-            const isOrdered = props.node?.parent?.type === 'list' &&
-              (props.node?.parent as any)?.ordered === true;
+            const isOrdered = (props.node as any)?.parent?.type === 'list' &&
+              (props.node as any)?.parent?.ordered === true;
             return (
               <li className="flex items-start gap-2.5 text-gold-100/75 text-[0.95rem] leading-relaxed">
                 {isOrdered ? (

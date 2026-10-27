@@ -78,8 +78,3 @@ const ResetPasswordPage: React.FC = () => {
 };
 
 export default ResetPasswordPage;
-81
-
-<system-reminder>
-<total_tokens>14906258 tokens left</total_tokens>
-</system-reminder>

@@ -14,9 +14,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<string | false>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  isEnrolled: (productId: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
   updatePassword: (newPassword: string) => Promise<boolean>;
-  isEnrolled: (productId: string) => Promise<boolean>;
   isAdmin: boolean;
   isCollaborator: boolean;
 }
@@ -24,12 +24,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => false as false,
+  login: async () => false,
   register: async () => false,
   logout: async () => {},
+  isEnrolled: async () => false,
   resetPassword: async () => false,
   updatePassword: async () => false,
-  isEnrolled: async () => false,
   isAdmin: false,
   isCollaborator: false,
 });
@@ -79,32 +79,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
     });
     if (error) {
-      const msg = error.message?.toLowerCase().includes('confirm')
-        ? 'Vérifiez votre boîte mail pour confirmer votre compte avant de vous connecter.'
-        : 'Email ou mot de passe incorrect.';
-      toast({ title: 'Erreur', description: msg, variant: 'destructive' });
+      toast({ title: 'Erreur', description: 'Email ou mot de passe incorrect.', variant: 'destructive' });
       return false;
     }
-    const { data: profile } = await supabase
-      .from('ecom_customers')
-      .select('name, role')
-      .eq('email', email.toLowerCase())
-      .maybeSingle();
-    const role = profile?.role || 'student';
-    const u = { email: email.toLowerCase(), name: profile?.name || email.split('@')[0], role };
-    setUser(u);
-    toast({ title: 'Connexion réussie', description: `Bienvenue, ${u.name} !` });
-    return role;
+    toast({ title: 'Connexion réussie', description: 'Bienvenue !' });
+    return 'student';
+  };
+
+  const resetPassword = async (email: string): Promise<boolean> => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.toLowerCase(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    toast({ title: 'Email envoyé', description: 'Vérifiez votre boîte mail.' });
+    return true;
+  };
+
+  const updatePassword = async (newPassword: string): Promise<boolean> => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    toast({ title: 'Mot de passe mis à jour', description: 'Votre mot de passe a été modifié.' });
+    return true;
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     const { error: authError } = await supabase.auth.signUp({
       email: email.toLowerCase(),
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/connexion`,
-        data: { full_name: name },
-      },
     });
     if (authError) {
       toast({ title: 'Erreur', description: authError.message, variant: 'destructive' });
@@ -115,29 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .from('ecom_customers')
       .upsert({ email: email.toLowerCase(), name, role: 'student' }, { onConflict: 'email' });
 
-    toast({ title: 'Inscription réussie', description: 'Vérifiez votre boîte mail pour confirmer votre adresse.' });
-    return true;
-  };
-
-  const resetPassword = async (email: string): Promise<boolean> => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email.toLowerCase(), {
-      redirectTo: `${window.location.origin}/reinitialiser`,
-    });
-    if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
-      return false;
-    }
-    toast({ title: 'Email envoyé', description: 'Vérifiez votre boîte mail pour réinitialiser votre mot de passe.' });
-    return true;
-  };
-
-  const updatePassword = async (newPassword: string): Promise<boolean> => {
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
-      return false;
-    }
-    toast({ title: 'Mot de passe mis à jour', description: 'Votre mot de passe a été modifié avec succès.' });
+    toast({ title: 'Inscription réussie', description: `Bienvenue, ${name} !` });
     return true;
   };
 
@@ -166,13 +151,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isCollaborator = user?.role === 'collaborator' || user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, resetPassword, updatePassword, isEnrolled, isAdmin, isCollaborator }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, isEnrolled, resetPassword, updatePassword, isAdmin, isCollaborator }}>
       {children}
     </AuthContext.Provider>
   );
 };
-174
-
-<system-reminder>
-<total_tokens>14910412 tokens left</total_tokens>
-</system-reminder>

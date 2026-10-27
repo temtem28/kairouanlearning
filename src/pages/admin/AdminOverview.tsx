@@ -148,7 +148,7 @@ const AdminOverview: React.FC = () => {
             <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
             <Tooltip
-              formatter={(v: number) => [`${v.toFixed(2)} €`, 'Revenus']}
+              formatter={(v) => [`${Number(v ?? 0).toFixed(2)} €`, 'Revenus']}
               contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}
             />
             <Bar dataKey="value" fill="#059669" radius={[4, 4, 0, 0]} />
