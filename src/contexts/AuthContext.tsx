@@ -1,6 +1,6 @@
 ﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 interface User {
   email: string;
@@ -79,10 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
     });
     if (error) {
-      toast({ title: 'Erreur', description: 'Email ou mot de passe incorrect.', variant: 'destructive' });
+      toast.error('Email ou mot de passe incorrect.');
       return false;
     }
-    toast({ title: 'Connexion réussie', description: 'Bienvenue !' });
+    toast.success('Connexion réussie');
     return 'student';
   };
 
@@ -91,20 +91,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error(error.message);
       return false;
     }
-    toast({ title: 'Email envoyé', description: 'Vérifiez votre boîte mail.' });
+    toast.success('Email envoyé — vérifiez votre boîte mail.');
     return true;
   };
 
   const updatePassword = async (newPassword: string): Promise<boolean> => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error(error.message);
       return false;
     }
-    toast({ title: 'Mot de passe mis à jour', description: 'Votre mot de passe a été modifié.' });
+    toast.success('Mot de passe mis à jour.');
     return true;
   };
 
@@ -114,22 +114,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
     });
     if (authError) {
-      toast({ title: 'Erreur', description: authError.message, variant: 'destructive' });
+      toast.error(authError.message);
       return false;
     }
-    // Upsert profile in ecom_customers
     await supabase
       .from('ecom_customers')
       .upsert({ email: email.toLowerCase(), name, role: 'student' }, { onConflict: 'email' });
 
-    toast({ title: 'Inscription réussie', description: `Bienvenue, ${name} !` });
+    toast.success(`Bienvenue, ${name} !`);
     return true;
   };
 
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    toast({ title: 'Déconnexion', description: 'À bientôt !' });
+    toast('À bientôt !');
   };
 
   const isEnrolled = async (productId: string): Promise<boolean> => {
