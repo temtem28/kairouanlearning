@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import {
   ArrowLeft, Save, Plus, Trash2, Edit2, GripVertical, ChevronDown, ChevronUp,
   BookOpen, Video, FileText, HelpCircle, Eye, EyeOff, Paperclip, X, Check
@@ -525,9 +525,9 @@ const AdminCourseEditor: React.FC = () => {
 
     setSaving(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Cours mis à jour' });
+      toast.success("Cours mis à jour");
     }
   };
 
@@ -597,9 +597,9 @@ const AdminCourseEditor: React.FC = () => {
           }
         }
       }
-      toast({ title: 'Contenu enregistré' });
+      toast.success("Contenu enregistré");
     } catch (err: any) {
-      toast({ title: 'Erreur', description: err.message, variant: 'destructive' });
+      toast.error("Erreur — " + err.message);
     }
     setSaving(false);
   };

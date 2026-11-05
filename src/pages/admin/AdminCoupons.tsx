@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Plus, Tag, Trash2, ToggleLeft, ToggleRight, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import {
@@ -32,11 +32,11 @@ const AdminCoupons: React.FC = () => {
 
   const handleCreate = async () => {
     if (!form.code) {
-      toast({ title: 'Code requis', variant: 'destructive' });
+      toast.error("Code requis");
       return;
     }
     if (!form.percent_off && !form.amount_off) {
-      toast({ title: 'Réduction requise', description: 'Renseignez un % ou un montant.', variant: 'destructive' });
+      toast.error("Réduction requise — Renseignez un % ou un montant.");
       return;
     }
     setCreating(true);
@@ -49,9 +49,9 @@ const AdminCoupons: React.FC = () => {
     });
     setCreating(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Coupon créé' });
+      toast.success("Coupon créé");
       setShowCreate(false);
       setForm({ code: '', percent_off: '', amount_off: '', active: true, expires_at: '' });
       fetchCoupons();
@@ -61,20 +61,20 @@ const AdminCoupons: React.FC = () => {
   const handleToggle = async (coupon: any) => {
     await supabase.from('ecom_coupons').update({ active: !coupon.active }).eq('id', coupon.id);
     setCoupons(prev => prev.map(c => c.id === coupon.id ? { ...c, active: !c.active } : c));
-    toast({ title: coupon.active ? 'Coupon désactivé' : 'Coupon activé' });
+    toast.success(coupon.active ? 'Coupon désactivé' : 'Coupon activé');
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
     await supabase.from('ecom_coupons').delete().eq('id', deleteId);
     setCoupons(prev => prev.filter(c => c.id !== deleteId));
-    toast({ title: 'Coupon supprimé' });
+    toast.success("Coupon supprimé");
     setDeleteId(null);
   };
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast({ title: `"${code}" copié` });
+    toast.success(`"${code}" copié`);
   };
 
   const isExpired = (c: any) => c.expires_at && new Date(c.expires_at) <= new Date();

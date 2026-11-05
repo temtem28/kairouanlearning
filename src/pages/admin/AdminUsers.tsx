@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import {
   Search, Plus, Trash2, Shield, User, Users, UserCheck, Loader2,
   BookOpen, TrendingUp, X, ChevronRight, Eye,
@@ -188,7 +188,7 @@ const AdminUsers: React.FC = () => {
 
   const handleRoleChange = async (email: string, newRole: string) => {
     if (email === me?.email && newRole !== 'admin') {
-      toast({ title: 'Action refusée', description: 'Vous ne pouvez pas retirer vos propres droits admin.', variant: 'destructive' });
+      toast.error("Action refusée — Vous ne pouvez pas retirer vos propres droits admin.");
       return;
     }
     setUpdatingId(email);
@@ -198,33 +198,33 @@ const AdminUsers: React.FC = () => {
       .eq('email', email);
     setUpdatingId(null);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
       setUsers(prev => prev.map(u => u.email === email ? { ...u, role: newRole } : u));
-      toast({ title: 'Rôle mis à jour' });
+      toast.success("Rôle mis à jour");
     }
   };
 
   const handleDelete = async () => {
     if (!deleteEmail) return;
     if (deleteEmail === me?.email) {
-      toast({ title: 'Action refusée', description: 'Impossible de supprimer votre propre compte.', variant: 'destructive' });
+      toast.error("Action refusée — Impossible de supprimer votre propre compte.");
       setDeleteEmail(null);
       return;
     }
     const { error } = await supabase.from('ecom_customers').delete().eq('email', deleteEmail);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
       setUsers(prev => prev.filter(u => u.email !== deleteEmail));
-      toast({ title: 'Compte supprimé' });
+      toast.success("Compte supprimé");
     }
     setDeleteEmail(null);
   };
 
   const handleCreate = async () => {
     if (!newUser.name || !newUser.email) {
-      toast({ title: 'Champs requis', description: 'Nom et email obligatoires.', variant: 'destructive' });
+      toast.error("Champs requis — Nom et email obligatoires.");
       return;
     }
     setCreating(true);
@@ -233,9 +233,9 @@ const AdminUsers: React.FC = () => {
       .upsert({ email: newUser.email.toLowerCase(), name: newUser.name, role: newUser.role }, { onConflict: 'email' });
     setCreating(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Compte créé', description: `${newUser.name} peut maintenant se connecter.` });
+      toast.success(`Compte créé — ${newUser.name} peut maintenant se connecter.`);
       setShowCreate(false);
       setNewUser({ name: '', email: '', role: 'collaborator' });
       fetchUsers();

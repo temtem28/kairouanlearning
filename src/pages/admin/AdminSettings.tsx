@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Save, Palette, Home, Mail, Globe, Shield, BookOpen, RefreshCw } from 'lucide-react';
 import { DEFAULT_SETTINGS, SiteSettings, applySettingsToDOM, saveSettings, loadSettings } from '@/hooks/useSiteSettings';
 
@@ -61,12 +61,12 @@ const AdminSettings: React.FC = () => {
     await saveSettings(form);
     applySettingsToDOM(form);
     setSaving(false);
-    toast({ title: 'Paramètres enregistrés', description: 'Les modifications sont en ligne.' });
+    toast.success("Paramètres enregistrés — Les modifications sont en ligne.");
   };
 
   const handleReset = () => {
     setForm(DEFAULT_SETTINGS);
-    toast({ title: 'Réinitialisation', description: 'Paramètres par défaut restaurés. Cliquez sur Enregistrer pour appliquer.' });
+    toast.success("Réinitialisation — Paramètres par défaut restaurés. Cliquez sur Enregistrer pour appliquer.");
   };
 
   if (loading) return (

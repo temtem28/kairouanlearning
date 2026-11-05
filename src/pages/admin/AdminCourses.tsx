@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import {
   Plus, Search, Edit2, Trash2, Eye, BookOpen,
   MoreVertical, Users, ToggleLeft, ToggleRight
@@ -91,7 +91,7 @@ const AdminCourses: React.FC = () => {
       .eq('id', course.id);
     if (!error) {
       setCourses(prev => prev.map(c => c.id === course.id ? { ...c, status: newStatus } : c));
-      toast({ title: `Cours ${newStatus === 'active' ? 'publié' : 'passé en brouillon'}` });
+      toast.success(newStatus === 'active' ? 'Cours publié' : 'Cours passé en brouillon');
     }
   };
 
@@ -99,17 +99,17 @@ const AdminCourses: React.FC = () => {
     if (!deleteId) return;
     const { error } = await supabase.from('ecom_products').delete().eq('id', deleteId);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
       setCourses(prev => prev.filter(c => c.id !== deleteId));
-      toast({ title: 'Cours supprimé' });
+      toast.success("Cours supprimé");
     }
     setDeleteId(null);
   };
 
   const handleCreate = async () => {
     if (!newCourse.name || !newCourse.handle) {
-      toast({ title: 'Champs requis', description: 'Titre et identifiant URL obligatoires.', variant: 'destructive' });
+      toast.error("Champs requis — Titre et identifiant URL obligatoires.");
       return;
     }
     setCreating(true);
@@ -130,9 +130,9 @@ const AdminCourses: React.FC = () => {
 
     setCreating(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Cours créé', description: 'Vous pouvez maintenant ajouter des modules et leçons.' });
+      toast.success("Cours créé — Vous pouvez maintenant ajouter des modules et leçons.");
       setShowCreate(false);
       navigate(`/admin/cours/${data.id}`);
     }

@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Search, Users, CheckCircle, Clock, Filter, Plus, Loader2, UserCheck, BookOpen, Mail, Copy, Ban, Trash2, RefreshCw } from 'lucide-react';
 import {
   AlertDialog,
@@ -68,10 +68,10 @@ const AdminStudents: React.FC = () => {
     if (!revokeId) return;
     const { error } = await supabase.from('lms_enrollments').update({ status: 'revoked' }).eq('id', revokeId);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
       setEnrollments(prev => prev.map(e => e.id === revokeId ? { ...e, status: 'revoked' } : e));
-      toast({ title: 'Accès révoqué' });
+      toast.success("Accès révoqué");
     }
     setRevokeId(null);
   };
@@ -79,16 +79,16 @@ const AdminStudents: React.FC = () => {
   const handleRestore = async (id: string) => {
     await supabase.from('lms_enrollments').update({ status: 'active' }).eq('id', id);
     setEnrollments(prev => prev.map(e => e.id === id ? { ...e, status: 'active' } : e));
-    toast({ title: 'Accès restauré' });
+    toast.success("Accès restauré");
   };
 
   const handleCreateStudent = async () => {
     if (!newStudent.name || !newStudent.email) {
-      toast({ title: 'Champs requis', description: 'Nom et email obligatoires.', variant: 'destructive' });
+      toast.error("Champs requis — Nom et email obligatoires.");
       return;
     }
     if (newStudent.password && newStudent.password.length < 6) {
-      toast({ title: 'Mot de passe trop court', description: 'Minimum 6 caractères.', variant: 'destructive' });
+      toast.error("Mot de passe trop court — Minimum 6 caractères.");
       return;
     }
     setCreating(true);
@@ -100,7 +100,7 @@ const AdminStudents: React.FC = () => {
 
     if (dbError) {
       setCreating(false);
-      toast({ title: 'Erreur base de données', description: dbError.message, variant: 'destructive' });
+      toast.error("Erreur base de données — " + dbError.message);
       return;
     }
 
@@ -112,7 +112,7 @@ const AdminStudents: React.FC = () => {
       });
       setCreating(false);
       if (signUpError && !signUpError.message.includes('already registered')) {
-        toast({ title: 'Erreur création compte', description: signUpError.message, variant: 'destructive' });
+        toast.error("Erreur création compte — " + signUpError.message);
       } else {
         setWelcomeEmail({ email, password: newStudent.password, name: newStudent.name });
       }
@@ -123,9 +123,9 @@ const AdminStudents: React.FC = () => {
       });
       setCreating(false);
       if (otpError) {
-        toast({ title: 'Compte créé, lien non envoyé', description: otpError.message, variant: 'destructive' });
+        toast.error("Compte créé, lien non envoyé — " + otpError.message);
       } else {
-        toast({ title: 'Compte créé ✓', description: `Un lien de connexion a été envoyé à ${email}.` });
+        toast.success(`Compte créé ✓ — Un lien de connexion a été envoyé à ${email}.`);
       }
     }
 
@@ -140,9 +140,9 @@ const AdminStudents: React.FC = () => {
       options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}/dashboard` },
     });
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Lien renvoyé ✓', description: `Un nouveau lien de connexion a été envoyé à ${email}.` });
+      toast.success(`Lien renvoyé ✓ — Un nouveau lien de connexion a été envoyé à ${email}.`);
     }
   };
 
@@ -154,7 +154,7 @@ const AdminStudents: React.FC = () => {
 
   const handleEnroll = async () => {
     if (!enrollTarget || !enrollForm.product_id) {
-      toast({ title: 'Cours requis', description: 'Sélectionnez un cours.', variant: 'destructive' });
+      toast.error("Cours requis — Sélectionnez un cours.");
       return;
     }
     setEnrolling(true);
@@ -166,9 +166,9 @@ const AdminStudents: React.FC = () => {
     });
     setEnrolling(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Étudiant inscrit ✓', description: `${enrollTarget.name} a maintenant accès au cours.` });
+      toast.success(`Étudiant inscrit ✓ — ${enrollTarget.name} a maintenant accès au cours.`);
       setShowEnroll(false);
       fetchData();
     }
@@ -184,7 +184,7 @@ const AdminStudents: React.FC = () => {
     for (const e of emailEnrollments) {
       await supabase.from('lms_enrollments').update({ status: newStatus === 'suspended' ? 'revoked' : 'active' }).eq('id', e.id);
     }
-    toast({ title: newStatus === 'suspended' ? 'Compte suspendu' : 'Compte réactivé' });
+    toast.success(newStatus === 'suspended' ? 'Compte suspendu' : 'Compte réactivé');
     setSuspendTarget(null);
     fetchData();
   };
@@ -192,7 +192,7 @@ const AdminStudents: React.FC = () => {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     await supabase.from('ecom_customers').delete().eq('id', deleteTarget.id);
-    toast({ title: 'Compte supprimé', description: `${deleteTarget.name} a été supprimé.` });
+    toast.success(`Compte supprimé — ${deleteTarget.name} a été supprimé.`);
     setDeleteTarget(null);
     fetchData();
   };
@@ -215,7 +215,7 @@ Une fois connecté(e), vous pouvez modifier votre mot de passe depuis votre prof
 Cordialement,
 L'équipe Kairouan Academy`;
     navigator.clipboard.writeText(text);
-    toast({ title: 'Email copié ✓', description: 'Collez-le dans votre boîte mail et envoyez-le à l\'étudiant.' });
+    toast.success("Email copié ✓ — " + 'Collez-le dans votre boîte mail et envoyez-le à l\'étudiant.');
   };
 
   const isExpired = (e: any) => e.access_expires_at && new Date(e.access_expires_at) <= new Date();

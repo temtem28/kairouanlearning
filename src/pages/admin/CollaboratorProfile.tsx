@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { UserCircle, Save, Loader2 } from 'lucide-react';
 
 const CollaboratorProfile: React.FC = () => {
@@ -39,9 +39,9 @@ const CollaboratorProfile: React.FC = () => {
       .eq('email', user.email);
     setSaving(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast.error("Erreur — " + error.message);
     } else {
-      toast({ title: 'Profil mis à jour', description: 'Vos informations ont été enregistrées.' });
+      toast.success("Profil mis à jour — Vos informations ont été enregistrées.");
     }
   };
 
