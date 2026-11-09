@@ -68,7 +68,7 @@ const LessonDialog: React.FC<{
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl flex flex-col p-0 gap-0 max-h-[90vh]">
+      <DialogContent className="max-w-2xl flex flex-col p-0 gap-0 max-h-[90vh] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
           <DialogTitle>{form.id ? 'Modifier la leçon' : 'Nouvelle leçon'}</DialogTitle>
         </DialogHeader>
