@@ -238,7 +238,7 @@ const LessonPage: React.FC = () => {
   const markComplete = async () => {
     if (!user || !currentLesson || !enrolled) return;
     if (!isLessonUnlocked(currentLesson)) return;
-    await supabase.from('lms_progress').upsert(
+    const { error } = await supabase.from('lms_progress').upsert(
       {
         user_email: user.email,
         lesson_id: currentLesson.id,
@@ -247,6 +247,10 @@ const LessonPage: React.FC = () => {
       },
       { onConflict: 'user_email,lesson_id' }
     );
+    if (error) {
+      console.error('lms_progress upsert error:', error);
+      return;
+    }
     const next = new Set(completedLessons);
     next.add(currentLesson.id);
     setCompletedLessons(next);
@@ -326,6 +330,17 @@ const LessonPage: React.FC = () => {
   const currentIndex = allLessons.findIndex((l) => l.id === currentLesson?.id);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+
+  // Check if Suivant should open the module's quiz instead of jumping to the next lesson
+  const currentModIdx = currentLesson ? moduleIndexForLesson(currentLesson) : -1;
+  const currentMod = currentModIdx >= 0 ? modules[currentModIdx] : null;
+  const isLastLessonInModule = currentMod
+    ? currentMod.lessons[currentMod.lessons.length - 1]?.id === currentLesson?.id
+    : false;
+  const moduleQuizForNext = isLastLessonInModule && currentMod?.quizzes?.[0]
+    ? currentMod.quizzes[0]
+    : null;
+  const shouldGoToQuiz = !!moduleQuizForNext && !passedQuizzes.has(moduleQuizForNext.id) && isQuizUnlocked(moduleQuizForNext.id);
 
   const previewGuest = !user && (!!currentLesson?.is_free_preview || isFree);
 
@@ -630,7 +645,15 @@ const LessonPage: React.FC = () => {
                       <ChevronLeft className="w-4 h-4" /> Précédent
                     </button>
                   )}
-                  {nextLesson && isLessonUnlocked(nextLesson) && (
+                  {shouldGoToQuiz ? (
+                    <button
+                      type="button"
+                      onClick={() => loadQuiz(moduleQuizForNext!)}
+                      className="px-4 py-2.5 bg-gold-400/20 text-gold-300 rounded-xl hover:bg-gold-400/30 transition-colors flex items-center gap-1 text-sm border border-gold-400/20"
+                    >
+                      Quiz <ChevronRight className="w-4 h-4" />
+                    </button>
+                  ) : nextLesson && isLessonUnlocked(nextLesson) ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -641,7 +664,7 @@ const LessonPage: React.FC = () => {
                     >
                       Suivant <ChevronRight className="w-4 h-4" />
                     </button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

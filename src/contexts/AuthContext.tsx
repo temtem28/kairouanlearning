@@ -82,8 +82,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error('Email ou mot de passe incorrect.');
       return false;
     }
+    const { data: profile } = await supabase
+      .from('ecom_customers')
+      .select('role')
+      .eq('email', email.toLowerCase())
+      .maybeSingle();
     toast.success('Connexion réussie');
-    return 'student';
+    return (profile?.role as string) || 'student';
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {

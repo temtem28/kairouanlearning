@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import { BookOpen, Award, CheckCircle, Play, BarChart3, Download, User, LogOut, Lock } from 'lucide-react';
 
 const DashboardPage: React.FC = () => {
-  const { user, logout, updatePassword } = useAuth();
+  const { user, loading: authLoading, logout, updatePassword } = useAuth();
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [progress, setProgress] = useState<Record<string, { total: number; completed: number }>>({});
@@ -26,9 +26,10 @@ const DashboardPage: React.FC = () => {
   const [pwSuccess, setPwSuccess] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { navigate('/connexion'); return; }
     fetchData();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchData = async () => {
     if (!user) return;
